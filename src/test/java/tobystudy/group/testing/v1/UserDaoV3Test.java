@@ -92,11 +92,5 @@ class UserDaoV3Test {
         assertThatThrownBy(() -> userDao.get("test")).isInstanceOf(EmptyResultDataAccessException.class);
     }
 
-    static class TestConfig {
 
-    }
-
-    @org.springframework.context.annotation.Configuration
-    public static class ContextConfiguration {
-    }
 }
