@@ -1,4 +1,4 @@
-package tobystudy.group.testing;
+package tobystudy.group.exception;
 
 
 import lombok.AllArgsConstructor;

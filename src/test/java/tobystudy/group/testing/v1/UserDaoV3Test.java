@@ -9,7 +9,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 import tobystudy.group.testing.TestConfiguration;
-import tobystudy.group.testing.User;
+import tobystudy.group.exception.User;
 
 import java.sql.SQLException;
 

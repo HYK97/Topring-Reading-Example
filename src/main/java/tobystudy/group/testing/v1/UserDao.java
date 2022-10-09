@@ -1,7 +1,7 @@
 package tobystudy.group.testing.v1;
 
 import org.springframework.dao.EmptyResultDataAccessException;
-import tobystudy.group.testing.User;
+import tobystudy.group.exception.User;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
