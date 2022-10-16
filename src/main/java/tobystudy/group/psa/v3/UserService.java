@@ -3,7 +3,10 @@ package tobystudy.group.psa.v3;
 import java.util.List;
 
 public class UserService {
+    public static final int MIN_LOGCOUNT_FOR_SILVER = 50;
+    public static final int MIN_RECCOMMEND_FORGOLD = 30;
     private final UserDao userDao;
+
 
     public UserService(UserDao userDao) {
         this.userDao = userDao;
@@ -18,7 +21,7 @@ public class UserService {
         }
     }
 
-    private void upgradeLevel(User user) {
+    protected void upgradeLevel(User user) {
         user.upgradeLevel();
         userDao.update(user);
     }
@@ -26,9 +29,9 @@ public class UserService {
     private boolean canUpgradeLevel(User user) {
         switch (user.getLevel()) {
             case BASIC:
-                return user.getLogin() >= 50;
+                return user.getLogin() >= MIN_LOGCOUNT_FOR_SILVER;
             case SILVER:
-                return user.getRecommend() >= 30;
+                return user.getRecommend() >= MIN_RECCOMMEND_FORGOLD;
             case GOLD:
                 return false;
             default:
@@ -42,4 +45,6 @@ public class UserService {
         }
         userDao.add(user);
     }
+
+
 }

@@ -9,24 +9,23 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static tobystudy.group.psa.v3.UserService.MIN_LOGCOUNT_FOR_SILVER;
 import static tobystudy.group.psa.v3.UserService.MIN_RECCOMMEND_FORGOLD;
 
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(loader = AnnotationConfigContextLoader.class, classes = DaoFactory.class)
-class UserServiceTest {
-    @Autowired
-    UserService userService;
-
+public class UserServiceTest2 {
 
     @Autowired
     private UserDao userDao;
-    private List<User> users;
 
+    private List<User> users = new ArrayList<>();
 
     @BeforeEach
     public void setup() {
@@ -42,23 +41,28 @@ class UserServiceTest {
         userDao.deleteAll();
     }
 
+
     @Test
-    public void upgradeLevel() {
+    public void upgradeAllOrNothing() {
         //given
-        for (User user : users) {
-            userDao.add(user);
-        }
-        userService.upgradeLevels();
+        UserService userService = new TestUserService(userDao, users.get(3).getId());
         //when
+        for (User user : users) {
+            userService.add(user);
+        }
         //then
-        checkLevelUpgraded(users.get(0), false);
+        assertThatThrownBy(userService::upgradeLevels).isInstanceOf(IllegalArgumentException.class);
+        List<User> all = userDao.getAll();
+        for (User user : all) {
+            System.out.println("user = " + user);
+        }
         checkLevelUpgraded(users.get(1), true);
-        checkLevelUpgraded(users.get(2), false);
-        checkLevelUpgraded(users.get(3), true);
-        checkLevelUpgraded(users.get(4), false);
+
+
     }
 
-    private void checkLevelUpgraded(User user, boolean result) {
+
+    public void checkLevelUpgraded(User user, boolean result) {
         User updateUser = userDao.get(user.getId());
         if (result) {
             assertThat(updateUser.getLevel()).isEqualTo(user.getLevel().nextLevel());
@@ -67,19 +71,24 @@ class UserServiceTest {
         }
     }
 
-    @Test
-    public void add() {
-        //given
-        User levelGold = users.get(4);
-        User levelNull = users.get(0);
-        levelNull.setLevel(null);
-        //when
-        userService.add(levelGold);
-        userService.add(levelNull);
-        //then
-        assertThat(userDao.get(levelGold.getId()).getLevel()).isEqualTo(Level.GOLD);
-        assertThat(userDao.get(levelNull.getId()).getLevel()).isEqualTo(Level.BASIC);
+    static class TestUserService extends UserService {
+
+        private final String userId;
+
+        public TestUserService(UserDao userDao, String userId) {
+            super(userDao);
+            this.userId = userId;
+        }
+
+
+        @Override
+        protected void upgradeLevel(User user) {
+            if (userId.equals(user.getId())) {
+                throw new IllegalArgumentException("test");
+            } else {
+                super.upgradeLevel(user);
+            }
+        }
 
     }
-
 }
