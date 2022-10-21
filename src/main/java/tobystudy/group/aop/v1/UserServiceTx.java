@@ -5,7 +5,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 public class UserServiceTx implements UserService {
-    private final PlatformTransactionManager transactionManager;
+    private PlatformTransactionManager transactionManager;
     private UserService target;
 
     public UserServiceTx(UserService target, PlatformTransactionManager transactionManager) {
@@ -13,6 +13,16 @@ public class UserServiceTx implements UserService {
         this.transactionManager = transactionManager;
     }
 
+    public UserServiceTx() {
+    }
+
+    public void setTransactionManager(PlatformTransactionManager transactionManager) {
+        this.transactionManager = transactionManager;
+    }
+
+    public void setTarget(UserService target) {
+        this.target = target;
+    }
 
     @Override
     public void upgradeLevels() {

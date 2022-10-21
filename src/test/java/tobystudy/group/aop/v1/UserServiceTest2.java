@@ -30,8 +30,10 @@ public class UserServiceTest2 {
     @Autowired
     private UserDao userDao;
     private List<User> users = new ArrayList<>();
+
     @Autowired
     private PlatformTransactionManager txManager;
+
 
     @BeforeEach
     public void setup() {
@@ -50,14 +52,19 @@ public class UserServiceTest2 {
     @Test
     public void upgradeAllOrNothing() {
         //given
-        UserService userService = new TestUserService(userDao, users.get(3).getId(), this.txManager, this.dummyMailSender);
+        TestUserService userService = new TestUserService(userDao, users.get(3).getId(), this.dummyMailSender);
+
+        UserServiceTx userServiceTx = new UserServiceTx();
+        userServiceTx.setTarget(userService);
+        userServiceTx.setTransactionManager(txManager);
+
 
         //when
         for (User user : users) {
-            userService.add(user);
+            userServiceTx.add(user);
         }
         //then
-        assertThatThrownBy(userService::upgradeLevels).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(userServiceTx::upgradeLevels).isInstanceOf(IllegalArgumentException.class);
         List<User> all = userDao.getAll();
         for (User user : all) {
             System.out.println("user = " + user);
@@ -81,8 +88,8 @@ public class UserServiceTest2 {
 
         private final String userId;
 
-        public TestUserService(UserDao userDao, String userId, PlatformTransactionManager txManager, MailSender mailSender) {
-            super(userDao, mailSender, txManager);
+        public TestUserService(UserDao userDao, String userId, MailSender mailSender) {
+            super(userDao, mailSender);
             this.userId = userId;
         }
 

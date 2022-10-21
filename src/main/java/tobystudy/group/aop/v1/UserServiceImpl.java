@@ -2,42 +2,44 @@ package tobystudy.group.aop.v1;
 
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.util.List;
 
 public class UserServiceImpl implements UserService {
     public static final int MIN_LOGCOUNT_FOR_SILVER = 50;
     public static final int MIN_RECCOMMEND_FORGOLD = 30;
-    private final UserDao userDao;
 
-    private final MailSender mailSender;
+    private UserDao userDao;
+    private MailSender mailSender;
 
-    private final PlatformTransactionManager transactionManager;
-
-    public UserServiceImpl(UserDao userDao, MailSender mailSender, PlatformTransactionManager transactionManager) {
+    public UserServiceImpl(UserDao userDao, MailSender mailSender) {
         this.userDao = userDao;
         this.mailSender = mailSender;
-        this.transactionManager = transactionManager;
+
+    }
+
+    public UserServiceImpl() {
+
+    }
+
+    public void setUserDao(UserDao userDao) {
+        this.userDao = userDao;
+    }
+
+    public void setMailSender(MailSender mailSender) {
+        this.mailSender = mailSender;
     }
 
     @Override
     public void upgradeLevels() {
-        TransactionStatus status = transactionManager.getTransaction(new DefaultTransactionDefinition());
-        try {
-            List<User> all = userDao.getAll();
-            for (User user : all) {
-                if (canUpgradeLevel(user)) {
-                    upgradeLevel(user);
-                }
+
+        List<User> all = userDao.getAll();
+        for (User user : all) {
+            if (canUpgradeLevel(user)) {
+                upgradeLevel(user);
             }
-            this.transactionManager.commit(status);
-        } catch (Exception e) {
-            this.transactionManager.rollback(status);
-            throw e;
         }
+
     }
 
     protected void upgradeLevel(User user) {

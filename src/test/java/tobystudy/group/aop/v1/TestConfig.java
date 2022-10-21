@@ -21,11 +21,11 @@ public class TestConfig {
 
     @Bean
     public UserService userServiceImpl() {
-        return new UserServiceImpl(userDao(), mockMailSender(), transactionManager());
+        return new UserServiceImpl(userDao(), mockMailSender());
     }
 
     @Bean
-    public UserService userService() {
+    public UserServiceTx userService() {
         return new UserServiceTx(userServiceImpl(), transactionManager());
     }
 
