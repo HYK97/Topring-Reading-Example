@@ -31,4 +31,8 @@ public class MockMailSender implements MailSender {
             log.info("send mail info  = {} ", simpleMessage.toString());
         }
     }
+
+    public void clearRequest() throws MailException {
+        requests = new ArrayList<>();
+    }
 }

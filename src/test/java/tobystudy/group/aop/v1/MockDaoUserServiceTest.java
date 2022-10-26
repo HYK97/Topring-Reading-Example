@@ -45,6 +45,7 @@ class MockDaoUserServiceTest {
     @AfterEach
     public void clear() {
         userDao.deleteAll();
+        mailSender.clearRequest();
     }
 
     @Test

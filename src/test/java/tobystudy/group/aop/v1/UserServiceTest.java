@@ -42,6 +42,7 @@ class UserServiceTest {
 
     @AfterEach
     public void clear() {
+        mailSender.clearRequest();
         userDao.deleteAll();
     }
 
